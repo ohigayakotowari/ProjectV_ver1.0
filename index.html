@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>project V</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap');
+
+        :root {
+            /* ライトテーマ基調 */
+            --bg-primary: #f5f7fa;
+            /* 明るいグレー */
+            --bg-secondary: #ffffff;
+            /* 白 */
+            --bg-card: #ffffff;
+
+            /* アクセントカラー - コントラスト確保 */
+            --accent-attack: #d32f2f;
+            /* 濃い赤 */
+            --accent-defense: #0097a7;
+            /* 濃いシアン */
+            --accent-gold: #fbc02d;
+            /* ゴールド */
+
+            /* テキストカラー */
+            --text-primary: #1a237e;
+            /* 濃紺 */
+            --text-secondary: #455a64;
+            /* 濃いグレー */
+            --text-light: #ffffff;
+
+            --gradient-attack: linear-gradient(135deg, #d32f2f, #b71c1c);
+            --gradient-defense: linear-gradient(135deg, #0097a7, #006064);
+            --border-color: #cfd8dc;
+
+            /* 共通スタイル */
+            --shadow-card: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 8px 12px rgba(0, 0, 0, 0.15);
+            --radius-md: 8px;
+            --radius-lg: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            /* 日本語フォント優先 */
+            font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: var(--bg-secondary);
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .game-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: var(--accent-attack);
+        }
+
+        .game-info {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .info-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .score-display {
+            display: flex;
+            gap: 15px;
+        }
+
+        .score-box {
+            padding: 10px 25px;
+            text-align: center;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-card);
+            background: white;
+            border: 1px solid var(--border-color);
+        }
+
+        .score-box.attack {
+            border-bottom: 4px solid var(--accent-attack);
+        }
+
+        .score-box.defense {
+            border-bottom: 4px solid var(--accent-defense);
+        }
+
+        #title-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 5rem;
+            font-weight: 900;
+            letter-spacing: 5px;
+            color: var(--accent-attack);
+            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 50px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: inherit;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-height: 48px;
+            /* クリック領域確保 */
+        }
+
+        .btn-primary {
+            background: var(--accent-attack);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(211, 47, 47, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: #f5f5f5;
+            border-color: var(--text-secondary);
+        }
+
+        .btn:disabled {
+            background: #e0e0e0;
+            color: #9e9e9e;
+            border: 1px solid #bdbdbd;
+            box-shadow: none;
+            opacity: 1;
+            /* 薄くせずにグレーアウト */
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .pick-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .pick-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+        }
+
+        .player-indicator {
+            display: inline-block;
+            padding: 8px 25px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+        }
+
+        .player-indicator.p1 {
+            background: var(--gradient-attack);
+        }
+
+        .player-indicator.p2 {
+            background: var(--gradient-defense);
+            color: var(--bg-primary);
+        }
+
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        /* VALORANT風ピックレイアウト */
+        .pick-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .agent-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .agent-tile {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .agent-tile:hover {
+            border-color: var(--accent-attack);
+        }
+
+        .agent-tile.active {
+            border-color: var(--accent-attack);
+            background: rgba(255, 70, 85, 0.1);
+        }
+
+        .agent-tile.picked {
+            opacity: 0.5;
+            /* pointer-events: none; を削除 - ミラーピック対応 */
+            /* 選択済み表示のみ。クリック可否はJS側で制御 */
+        }
+
+        .agent-tile.opponent-picked {
+            /* 相手が選択中：選択可能だが視覚的に表示 */
+            border-color: var(--accent-defense);
+            background: rgba(0, 200, 200, 0.1);
+        }
+
+        .agent-tile.opponent-picked::after {
+            content: '相手選択中';
+            display: block;
+            font-size: 0.65rem;
+            color: var(--accent-defense);
+            margin-top: 5px;
+        }
+
+        .agent-tile .tile-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .agent-tile .tile-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .agent-detail {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            min-height: 400px;
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        .detail-icon {
+            font-size: 4rem;
+        }
+
+        .detail-name {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .detail-abilities {
+            margin-top: 20px;
+        }
+
+        .detail-ability {
+            background: var(--bg-card);
+            border-left: 3px solid var(--accent-attack);
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+
+        .detail-ability-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .detail-ability-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .detail-ability-cost {
+            font-size: 1rem;
+            color: var(--accent-attack);
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .detail-add-btn {
+            margin-top: 30px;
+            width: 100%;
+        }
+
+        .agent-card {
+            background: white;
+            padding: 20px;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            position: relative;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+            transition: all 0.2s ease;
+        }
+
+        .agent-card:hover {
+            border-color: var(--border-color);
+            /* ホバー時は影で表現 */
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .agent-card.selected {
+            border-color: var(--accent-attack);
+            box-shadow: 0 0 0 2px var(--accent-attack);
+        }
+
+        .agent-card.disabled {
+            opacity: 0.5;
+            background: #f0f0f0;
+            box-shadow: none;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .agent-card.killed {
+            opacity: 0.3;
+            border-color: #ff0000;
+        }
+
+        .agent-card.killed::after {
+            content: "KILLED";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 0, 0, 0.9);
+            padding: 5px 20px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .card-portrait {
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary));
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .card-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .card-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
+            font-size: 0.8rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            background: #f5f7fa;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .stat-dmg {
+            color: #c62828;
+        }
+
+        .stat-entry {
+            color: #00897b;
+        }
+
+        .stat-area {
+            color: #f9a825;
+        }
+
+        .stat-retake {
+            color: #5e35b1;
+        }
+
+        .selected-deck {
+            background: var(--bg-secondary);
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .selected-deck h3 {
+            margin-bottom: 15px;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        .deck-cards {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            min-height: 100px;
+        }
+
+        .deck-slot {
+            width: 90px;
+            height: 110px;
+            background: #f9f9f9;
+            border: 2px dashed var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+        }
+
+        .deck-slot.filled {
+            border-style: solid;
+            border-color: var(--accent-attack);
+        }
+
+        .deck-slot .mini-name {
+            font-size: 0.7rem;
+            text-align: center;
+            padding: 5px;
+        }
+
+        .credits {
+            font-size: 1.8rem;
+            color: var(--accent-gold);
+            font-weight: 700;
+        }
+
+        .ability-list {
+            margin-top: 15px;
+        }
+
+        .ability-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: white;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+            border: 1px solid var(--border-color);
+            border-left-width: 4px;
+            border-radius: var(--radius-md);
+        }
+
+        .ability-item:hover {
+            background: #f5f5f5;
+            border-left-color: var(--accent-attack);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .ability-item.purchased {
+            background: #e0f2f1;
+            border-left-color: var(--accent-defense);
+            border-color: #b2dfdb;
+        }
+
+        .ability-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .ability-cost {
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .ability-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        .round-container {
+            text-align: center;
+        }
+
+        .phase-display {
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin: 30px 0;
+            padding: 25px;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .result-section {
+            background: white;
+            padding: 40px;
+            margin: 30px 0;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-color);
+        }
+
+        .result-section h3 {
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .stats-comparison {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .stats-column {
+            text-align: center;
+        }
+
+        .stats-column h4 {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 8px 0;
+            font-size: 1rem;
+        }
+
+        .vs-divider {
+            font-size: 2rem;
+            color: var(--text-secondary);
+            font-weight: 900;
+            background: #eceff1;
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            border-radius: 50%;
+            margin: 0 auto;
+        }
+
+        .plant-badge {
+            display: inline-block;
+            padding: 20px 50px;
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin: 30px 0;
+            border-radius: var(--radius-lg);
+            color: white;
+            box-shadow: var(--shadow-card);
+        }
+
+        .plant-badge.complete {
+            background: var(--gradient-attack);
+        }
+
+        .plant-badge.incomplete {
+            background: var(--gradient-defense);
+            color: var(--bg-primary);
+        }
+
+        .kill-info {
+            font-size: 1.5rem;
+            margin: 15px 0;
+            font-weight: 700;
+        }
+
+        .kill-select-grid {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .kill-select-card {
+            background: white;
+            padding: 20px;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            transition: all 0.2s;
+            width: 240px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+        }
+
+        .kill-select-card:hover {
+            border-color: var(--accent-attack);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .kill-select-card.selected {
+            border-color: var(--accent-attack);
+            background: #ffebee;
+            /* 薄い赤背景 */
+            box-shadow: 0 0 0 2px var(--accent-attack);
+        }
+
+        .ability-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            background: var(--accent-defense);
+            color: white;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border-radius: 4px;
+            margin-left: 8px;
+        }
+
+        .winner-display {
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            padding: 40px;
+            margin: 40px 0;
+            border-radius: var(--radius-lg);
+            color: white;
+            /* 背景によるので白文字 */
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .winner-display.attack {
+            background: var(--gradient-attack);
+        }
+
+        .winner-display.defense {
+            background: var(--gradient-defense);
+        }
+
+        .winner-display.draw {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+
+        #end-screen {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .final-result {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            letter-spacing: 5px;
+        }
+
+        .final-scores {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        /* モーダル */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .rules-text {
+            text-align: left;
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        .rules-text h3 {
+            color: var(--accent-attack);
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .rules-text ul,
+        .rules-text ol {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .rules-text li {
+            margin-bottom: 5px;
+        }
+
+        /* 戻るボタン */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="game-header hidden" id="game-header">
+        <div class="game-title">PROJECT V</div>
+        <div class="game-info">
+            <div class="info-item">
+                <div class="info-label">ラウンド</div>
+                <div class="info-value" id="round-display">1 / 4</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">セット</div>
+                <div class="info-value" id="set-display">A</div>
+            </div>
+            <div class="score-display">
+                <div class="score-box attack">
+                    <div class="info-label" id="p1-role-label">P1 ATK</div>
+                    <div class="info-value" id="p1-score">0</div>
+                </div>
+                <div class="score-box defense">
+                    <div class="info-label" id="p2-role-label">P2 DEF</div>
+                    <div class="info-value" id="p2-score">0</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="title-screen">
+            <h1 class="logo">PROJECT V</h1>
+            <p class="subtitle">タクティカルカードゲーム</p>
+            <div style="display:flex;flex-direction:column;gap:15px;margin-top:30px;">
+                <button class="btn btn-primary" onclick="startPvP()">⚔️ PvP（2人対戦）</button>
+                <button class="btn btn-secondary" onclick="showNpcSelect()">🤖 PvE（NPC戦）</button>
+                <button class="btn btn-secondary" onclick="showRulesModal()" style="margin-top:20px;">📖 ルール説明</button>
+            </div>
+        </div>
+
+        <!-- ルール説明モーダル -->
+        <div id="rules-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2 style="margin-bottom:20px;">📖 ルール説明</h2>
+                <div class="rules-text">
+                    <h3>基本ルール</h3>
+                    <ul>
+                        <li>プレイヤーは5枚のエージェント（カード）を使う</li>
+                        <li>全エージェントの初期基本ステータス：ダメージ100 / エントリーパワー1 / エリアコントロール力1 / リテイクパワー1</li>
+                    </ul>
+                    <h3>キャラピック</h3>
+                    <ul>
+                        <li>相手と同じエージェントを選んでもよい（ミラーピックOK）</li>
+                    </ul>
+                    <h3>バイフェーズ</h3>
+                    <ul>
+                        <li>毎ラウンド開始時にクレジットが +1500 追加される（使わなかった分は持ち越し）</li>
+                        <li>購入したアビリティは、その試合中は二度と購入できない（攻防交代後も同様）</li>
+                        <li>アビリティ効果は購入したラウンドのみ有効</li>
+                    </ul>
+                    <h3>ラウンド進行</h3>
+                    <ol>
+                        <li>生存エージェントのステータスを集計</li>
+                        <li><strong>プラント判定</strong>：攻撃の総エントリー > 防衣の総エリア ならプラント完了</li>
+                        <li><strong>キル数計算</strong>：総ダメージ150ごとに相手を1体キル可能</li>
+                        <li>キルされるカードは「キルされる側が選ぶ」</li>
+                        <li><strong>勝敗判定</strong>で1ポイント付与：
+                            <ul>
+                                <li>両者全滅：プラント完了なら攻撃、未完了なら防衣に1点</li>
+                                <li>片側全滅：生存がいる側に1点</li>
+                                <li>両者残りあり：攻撃は総エリア、防衣は総リテイクで比較し高い側に1点（同値ならプラントで決定）</li>
+                            </ul>
+                        </li>
+                    </ol>
+                    <h3>勝利条件</h3>
+                    <ul>
+                        <li>2ラウンド終了で攻防交代、合計最大4ラウンド</li>
+                        <li>先に3ポイント取った側が勝ち、2-2は引き分け</li>
+                    </ul>
+                </div>
+                <button class="btn btn-primary" onclick="hideRulesModal()" style="margin-top:20px;">閉じる</button>
+            </div>
+        </div>
+
+        <div id="npc-select-screen" class="hidden">
+            <h2 style="font-size:1.8rem;letter-spacing:2px;margin-bottom:30px;">NPC対戦</h2>
+            <div id="npc-level-select">
+                <h3 style="margin-bottom:20px;color:var(--text-secondary);">難易度を選択</h3>
+                <div style="display:flex;gap:15px;justify-content:center;flex-wrap:wrap;">
+                    <button class="btn btn-secondary" onclick="showNpcList(1)">LEVEL 1（初心者）</button>
+                    <button class="btn btn-secondary" onclick="showNpcList(2)">LEVEL 2（標準）</button>
+                    <button class="btn btn-secondary" onclick="showNpcList(3)">LEVEL 3（上級）</button>
+                </div>
+            </div>
+            <div id="npc-list-container" class="hidden" style="margin-top:30px;"></div>
+            <div class="nav-buttons" style="margin-top:30px;">
+                <button class="btn btn-secondary" onclick="backToTitle()">戻る</button>
+            </div>
+        </div>
+
+        <div id="pick-screen" class="hidden">
+            <button class="btn btn-secondary back-btn" onclick="backToModeSelect()">← 戻る</button>
+            <div class="pick-header">
+                <h2>エージェント選択</h2>
+                <div class="player-indicator" id="current-picker">P1のターン</div>
+                <p style="margin-top:10px;color:var(--text-secondary);">5体のエージェントを選択してください</p>
+                <p style="margin-top:5px;color:var(--accent-attack);font-size:0.85rem;">※ミラーピック可（相手と同じエージェントを選択できます）</p>
+            </div>
+            <div class="pick-layout">
+                <div class="agent-list" id="agent-list"></div>
+                <div class="agent-detail" id="agent-detail">
+                    <p style="color:var(--text-secondary);text-align:center;padding:50px;">エージェントを選択すると詳細が表示されます</p>
+                </div>
+            </div>
+            <div class="selected-deck">
+                <h3>選択済み (<span id="deck-count">0</span>/5)</h3>
+                <div class="deck-cards" id="deck-cards"></div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="clearSelection()">クリア</button>
+                <button class="btn btn-primary" id="confirm-pick-btn" onclick="confirmPick()" disabled>確定</button>
+            </div>
+        </div>
+
+        <div id="buy-screen" class="hidden">
+            <div class="pick-header">
+                <h2>バイフェーズ</h2>
+                <div class="player-indicator" id="current-buyer">P1のターン</div>
+                <p style="margin-top:10px;color:var(--text-secondary);">アビリティを購入してエージェントを強化</p>
+            </div>
+            <div id="buy-cards-container"></div>
+            <div class="nav-buttons">
+                <button class="btn btn-primary" id="confirm-buy-btn" onclick="confirmBuy()">購入完了</button>
+            </div>
+        </div>
+
+        <div id="round-screen" class="hidden">
+            <div class="round-container">
+                <div class="phase-display" id="phase-display">ROUND</div>
+                <div id="round-content"></div>
+            </div>
+        </div>
+
+        <div id="kill-screen" class="hidden">
+            <div class="round-container">
+                <h2 style="font-size:1.8rem;letter-spacing:3px;">キル選択</h2>
+                <p id="kill-instruction" style="margin:20px 0;font-size:1.1rem;"></p>
+                <div class="kill-select-grid" id="kill-select-grid"></div>
+                <div class="nav-buttons">
+                    <button class="btn btn-primary" id="confirm-kill-btn" onclick="confirmKillSelection()"
+                        disabled>選択確定</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="end-screen" class="hidden">
+            <div class="final-result" id="final-result"></div>
+            <div class="final-scores" id="final-scores"></div>
+            <button class="btn btn-primary" onclick="location.reload()">もう一度プレイ</button>
+        </div>
+    </div>
+
+    <script>
+        const ABILITIES = {
+            // ジェット
+            JT1: { id: 'JT1', name: 'Tウィンド', cost: 300, desc: 'ダメージ+50, エントリー+1', type: 'stat', effect: { damage: 50, entry: 1 } },
+            JT2: { id: 'JT2', name: 'アップドラフト', cost: 300, desc: 'エリア+1', type: 'stat', effect: { area: 1 } },
+            JT3: { id: 'JT3', name: 'Cバースト', cost: 300, desc: 'エントリー+2', type: 'stat', effect: { entry: 2 } },
+            // アイソ
+            IS1: { id: 'IS1', name: 'アンダーカット', cost: 300, desc: 'エリア+1', type: 'stat', effect: { area: 1 } },
+            IS2: { id: 'IS2', name: 'ダブルタップ', cost: 300, desc: 'ダメージ+50, 相手ダメージ-50', type: 'mixed', effect: { damage: 50, reduceEnemyDamage: 50 } },
+            IS3: { id: 'IS3', name: 'コンティンジェンシー', cost: 300, desc: 'エントリー+1', type: 'stat', effect: { entry: 1 } },
+            // ネオン
+            NE1: { id: 'NE1', name: 'リレーボルト', cost: 300, desc: 'エリア+1', type: 'stat', effect: { area: 1 } },
+            NE2: { id: 'NE2', name: 'ハイギア', cost: 300, desc: 'ダメージ+50', type: 'stat', effect: { damage: 50 } },
+            NE3: { id: 'NE3', name: 'ファストレーン', cost: 300, desc: 'エントリー+1', type: 'stat', effect: { entry: 1 } },
+            // レイナ
+            RN1: { id: 'RN1', name: 'デバウアー', cost: 300, desc: '相手ダメージ-50', type: 'debuff', effect: { reduceEnemyDamage: 50 } },
+            RN2: { id: 'RN2', name: 'ディスミス', cost: 300, desc: 'エリア+1', type: 'stat', effect: { area: 1 } },
+            RN3: { id: 'RN3', name: 'リーア', cost: 300, desc: 'エントリー+1, エリア+1', type: 'stat', effect: { entry: 1, area: 1 } },
+            // アストラ
+            AS1: { id: 'AS1', name: 'ノヴァパルス', cost: 300, desc: 'リテイク+1, エリア+1', type: 'stat', effect: { retake: 1, area: 1 } },
+            AS2: { id: 'AS2', name: 'ネビュラ', cost: 300, desc: 'リテイク+1, エリア+1, エントリー+1', type: 'stat', effect: { retake: 1, area: 1, entry: 1 } },
+            AS3: { id: 'AS3', name: 'グラビティウェル', cost: 300, desc: 'エントリー+1, エリア+1', type: 'stat', effect: { entry: 1, area: 1 } },
+            // クローブ
+            CL1: { id: 'CL1', name: 'メドル', cost: 300, desc: 'ダメージ+50', type: 'stat', effect: { damage: 50 } },
+            CL2: { id: 'CL2', name: 'ルース', cost: 300, desc: 'エリア+1', type: 'stat', effect: { area: 1 } },
+            CL3: { id: 'CL3', name: 'ピック・ミー・アップ', cost: 300, desc: '相手ダメージ-50', type: 'debuff', effect: { reduceEnemyDamage: 50 } },
+            // ヴァイパー
+            VP1: { id: 'VP1', name: 'ポイズンクラウド', cost: 300, desc: 'エリア+1, ダメージ+50', type: 'stat', effect: { area: 1, damage: 50 } },
+            VP2: { id: 'VP2', name: 'トキシックスクリーン', cost: 300, desc: 'エリア+1, リテイク+1', type: 'stat', effect: { area: 1, retake: 1 } },
+            VP3: { id: 'VP3', name: 'スネークバイト', cost: 300, desc: 'エリア+2', type: 'stat', effect: { area: 2 } },
+            // ソーヴァ
+            SV1: { id: 'SV1', name: 'ショックボルト', cost: 300, desc: 'ダメージ+50', type: 'stat', effect: { damage: 50 } },
+            SV2: { id: 'SV2', name: 'リコンボルト', cost: 300, desc: 'リテイク+1, エントリー+1', type: 'stat', effect: { retake: 1, entry: 1 } },
+            SV3: { id: 'SV3', name: 'Oドローン', cost: 300, desc: 'リテイク+1, エントリー+1', type: 'stat', effect: { retake: 1, entry: 1 } },
+            // KAY/O
+            KY1: { id: 'KY1', name: 'F/ドライブ', cost: 300, desc: 'リテイク+1, エントリー+1', type: 'stat', effect: { retake: 1, entry: 1 } },
+            KY2: { id: 'KY2', name: '0/ポイント', cost: 300, desc: 'リテイク+1, エントリー+1, エリア+1', type: 'stat', effect: { retake: 1, entry: 1, area: 1 } },
+            KY3: { id: 'KY3', name: 'フラグ/メント', cost: 300, desc: '相手エントリー-2', type: 'debuff', effect: { reduceEnemyEntry: 2 } },
+            // テホ
+            TJ1: { id: 'TJ1', name: 'Sドローン', cost: 300, desc: 'エリア+1', type: 'stat', effect: { area: 1 } },
+            TJ2: { id: 'TJ2', name: 'Sデリバリー', cost: 300, desc: '相手リテイク-2', type: 'debuff', effect: { reduceEnemyRetake: 2 } },
+            TJ3: { id: 'TJ3', name: '誘導サルヴォ', cost: 500, desc: 'ダメージ+50, リテイク+1, エントリー+1', type: 'stat', effect: { damage: 50, retake: 1, entry: 1 } },
+            // スカイ
+            SK1: { id: 'SK1', name: 'Tブレイザー', cost: 300, desc: 'エリア+1', type: 'stat', effect: { area: 1 } },
+            SK2: { id: 'SK2', name: 'ガイディングL', cost: 300, desc: 'リテイク+1, エントリー+1', type: 'stat', effect: { retake: 1, entry: 1 } },
+            SK3: { id: 'SK3', name: 'リグロウス', cost: 400, desc: '相手ダメージ-100', type: 'debuff', effect: { reduceEnemyDamage: 100 } },
+            // キルジョイ
+            KJ1: { id: 'KJ1', name: 'アラームボット', cost: 300, desc: 'エリア+2', type: 'stat', effect: { area: 2 } },
+            KJ2: { id: 'KJ2', name: 'タレット', cost: 300, desc: 'エリア+2, ダメージ+30', type: 'stat', effect: { area: 2, damage: 30 } },
+            KJ3: { id: 'KJ3', name: 'ナノスワーム', cost: 300, desc: 'ダメージ+50', type: 'stat', effect: { damage: 50 } },
+            // サイファー
+            CY1: { id: 'CY1', name: 'Cケージ', cost: 300, desc: 'エリア+2', type: 'stat', effect: { area: 2 } },
+            CY2: { id: 'CY2', name: 'スパイカメラ', cost: 300, desc: 'エリア+2', type: 'stat', effect: { area: 2 } },
+            CY3: { id: 'CY3', name: 'Tワイヤー', cost: 300, desc: 'ダメージ+30, 相手エントリー-2', type: 'mixed', effect: { damage: 30, reduceEnemyEntry: 2 } },
+            // チェンバー
+            CH1: { id: 'CH1', name: 'ヘッドハンター', cost: 300, desc: 'ダメージ+50', type: 'stat', effect: { damage: 50 } },
+            CH2: { id: 'CH2', name: 'ランデヴー', cost: 300, desc: '相手エントリー-2', type: 'debuff', effect: { reduceEnemyEntry: 2 } },
+            CH3: { id: 'CH3', name: 'Tマーク', cost: 300, desc: 'エリア+1', type: 'stat', effect: { area: 1 } }
+        };
+
+        // 全エージェント共通の初期ステータス
+        const DEFAULT_BASE_STATS = { damage: 100, entry: 1, area: 1, retake: 1 };
+
+        const AGENTS = [
+            { id: '001', name: 'ジェット', icon: '💨', baseStats: DEFAULT_BASE_STATS, abilities: ['JT1', 'JT2', 'JT3'] },
+            { id: '002', name: 'アイソ', icon: '🔮', baseStats: DEFAULT_BASE_STATS, abilities: ['IS1', 'IS2', 'IS3'] },
+            { id: '003', name: 'ネオン', icon: '⚡', baseStats: DEFAULT_BASE_STATS, abilities: ['NE1', 'NE2', 'NE3'] },
+            { id: '004', name: 'レイナ', icon: '👁️', baseStats: DEFAULT_BASE_STATS, abilities: ['RN1', 'RN2', 'RN3'] },
+            { id: '005', name: 'アストラ', icon: '🌟', baseStats: DEFAULT_BASE_STATS, abilities: ['AS1', 'AS2', 'AS3'] },
+            { id: '006', name: 'クローブ', icon: '🦋', baseStats: DEFAULT_BASE_STATS, abilities: ['CL1', 'CL2', 'CL3'] },
+            { id: '007', name: 'ヴァイパー', icon: '🐍', baseStats: DEFAULT_BASE_STATS, abilities: ['VP1', 'VP2', 'VP3'] },
+            { id: '008', name: 'ソーヴァ', icon: '🦅', baseStats: DEFAULT_BASE_STATS, abilities: ['SV1', 'SV2', 'SV3'] },
+            { id: '009', name: 'KAY/O', icon: '🤖', baseStats: DEFAULT_BASE_STATS, abilities: ['KY1', 'KY2', 'KY3'] },
+            { id: '010', name: 'テホ', icon: '🎯', baseStats: DEFAULT_BASE_STATS, abilities: ['TJ1', 'TJ2', 'TJ3'] },
+            { id: '011', name: 'スカイ', icon: '🐦', baseStats: DEFAULT_BASE_STATS, abilities: ['SK1', 'SK2', 'SK3'] },
+            { id: '012', name: 'キルジョイ', icon: '🔧', baseStats: DEFAULT_BASE_STATS, abilities: ['KJ1', 'KJ2', 'KJ3'] },
+            { id: '013', name: 'サイファー', icon: '📷', baseStats: DEFAULT_BASE_STATS, abilities: ['CY1', 'CY2', 'CY3'] },
+            { id: '014', name: 'チェンバー', icon: '🎩', baseStats: DEFAULT_BASE_STATS, abilities: ['CH1', 'CH2', 'CH3'] }
+        ];
+
+        // NPC定義（3レベル×3人格=9体）
+        const NPCS = [
+            // LEVEL 1（初心者）
+            { id: 'L1-1', name: 'リンク', level: 1, personality: 'バランス型', deck: ['001', '005', '007', '010', '012'], buyPriority: 'random', killPolicy: 'random' },
+            { id: 'L1-2', name: 'レックス', level: 1, personality: '攻撃好き', deck: ['001', '003', '004', '002', '006'], buyPriority: 'damage', killPolicy: 'random' },
+            { id: 'L1-3', name: 'シールド', level: 1, personality: '守り好き', deck: ['007', '012', '013', '014', '005'], buyPriority: 'area', killPolicy: 'random' },
+            // LEVEL 2（標準）
+            { id: 'L2-1', name: 'ブレイズ', level: 2, personality: 'エントリー重視', deck: ['001', '003', '004', '008', '011'], buyPriority: 'entry', killPolicy: 'keepStrong' },
+            { id: 'L2-2', name: 'ガーディアン', level: 2, personality: 'リテイク重視', deck: ['005', '008', '009', '010', '011'], buyPriority: 'retake', killPolicy: 'keepStrong' },
+            { id: 'L2-3', name: 'サボター', level: 2, personality: '妨害重視', deck: ['004', '006', '009', '011', '013'], buyPriority: 'debuff', killPolicy: 'keepStrong' },
+            // LEVEL 3（上級）
+            { id: 'L3-1', name: 'タクティクス', level: 3, personality: 'プラント最適化', deck: ['001', '003', '005', '008', '010'], buyPriority: 'plant', killPolicy: 'optimal' },
+            { id: 'L3-2', name: 'エンデューロ', level: 3, personality: '残数勝負', deck: ['005', '007', '009', '010', '012'], buyPriority: 'survival', killPolicy: 'optimal' },
+            { id: 'L3-3', name: 'アダプター', level: 3, personality: 'カウンター', deck: ['002', '006', '009', '011', '014'], buyPriority: 'counter', killPolicy: 'optimal' }
+        ];
+
+        let gameState = {
+            phase: 'title', roundIndex: 1, setIndex: 1,
+            gameMode: 'pvp', // 'pvp' or 'pve'
+            selectedNpc: null, // PvE時のNPC
+            roles: { attacker: 'P1', defender: 'P2' },
+            scores: { P1: 0, P2: 0 },
+            credits: { P1: 0, P2: 0 }, // ラウンド開始時に+1500される
+            decks: { P1: [], P2: [] },
+            purchases: { P1: {}, P2: {} }, // 現ラウンド購入（アビリティ効果用）
+            matchPurchases: { P1: new Set(), P2: new Set() }, // 試合全体の購入履歴（購入権利管理用）
+            killed: { P1: [], P2: [] },
+            currentPicker: 'P1', currentBuyer: 'P1',
+            tempSelection: [], plantComplete: false, computed: null,
+            killCounts: { P1: 0, P2: 0 }, killSelecting: null, tempKillSelection: []
+        };
+
+        function $(id) { return document.getElementById(id); }
+        function showScreen(screenId) {
+            ['title-screen', 'npc-select-screen', 'pick-screen', 'buy-screen', 'round-screen', 'kill-screen', 'end-screen'].forEach(id => $(id).classList.add('hidden'));
+            $(screenId).classList.remove('hidden');
+            $('game-header').classList.toggle('hidden', screenId === 'title-screen' || screenId === 'npc-select-screen');
+        }
+        function updateHeader() {
+            $('round-display').textContent = `${gameState.roundIndex} / 4`;
+            $('set-display').textContent = gameState.setIndex === 1 ? 'A' : 'B';
+            $('p1-score').textContent = gameState.scores.P1;
+            $('p2-score').textContent = gameState.scores.P2;
+            const p1Role = gameState.roles.attacker === 'P1' ? 'ATK' : 'DEF';
+            const p2Role = gameState.roles.attacker === 'P2' ? 'ATK' : 'DEF';
+            $('p1-role-label').textContent = `P1 ${p1Role}`;
+            $('p2-role-label').textContent = `P2 ${p2Role}`;
+        }
+
+        // === モード選択・NPC選択 ===
+        function backToTitle() {
+            showScreen('title-screen');
+        }
+
+        function showRulesModal() {
+            $('rules-modal').classList.remove('hidden');
+        }
+
+        function hideRulesModal() {
+            $('rules-modal').classList.add('hidden');
+        }
+
+        function backToModeSelect() {
+            // ゲーム状態をリセット
+            resetGameState();
+            showScreen('title-screen');
+        }
+
+        function resetGameState() {
+            gameState.phase = 'title';
+            gameState.roundIndex = 1;
+            gameState.setIndex = 1;
+            gameState.gameMode = 'pvp';
+            gameState.selectedNpc = null;
+            gameState.roles = { attacker: 'P1', defender: 'P2' };
+            gameState.scores = { P1: 0, P2: 0 };
+            gameState.credits = { P1: 0, P2: 0 };
+            gameState.decks = { P1: [], P2: [] };
+            gameState.purchases = { P1: {}, P2: {} };
+            gameState.matchPurchases = { P1: new Set(), P2: new Set() };
+            gameState.killed = { P1: [], P2: [] };
+            gameState.currentPicker = 'P1';
+            gameState.currentBuyer = 'P1';
+            gameState.tempSelection = [];
+            gameState.plantComplete = false;
+            gameState.computed = null;
+            gameState.killCounts = { P1: 0, P2: 0 };
+            gameState.killSelecting = null;
+            gameState.tempKillSelection = [];
+        }
+
+        function showNpcSelect() {
+            showScreen('npc-select-screen');
+            $('npc-level-select').classList.remove('hidden');
+            $('npc-list-container').classList.add('hidden');
+        }
+
+        function showNpcList(level) {
+            const npcs = NPCS.filter(n => n.level === level);
+            $('npc-list-container').innerHTML = `
+                <h3 style="margin-bottom:15px;">LEVEL ${level} NPC選択</h3>
+                <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;">
+                    ${npcs.map(npc => `
+                        <div class="npc-card" onclick="selectNpc('${npc.id}')" style="
+                            background:var(--panel-bg);border:2px solid var(--border-color);border-radius:var(--radius-md);
+                            padding:20px;min-width:180px;cursor:pointer;text-align:center;
+                            transition:all 0.2s;box-shadow:var(--shadow-sm);">
+                            <div style="font-size:2rem;">🤖</div>
+                            <div style="font-size:1.2rem;font-weight:bold;margin:10px 0;">${npc.name}</div>
+                            <div style="color:var(--text-secondary);font-size:0.9rem;">${npc.personality}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            $('npc-list-container').classList.remove('hidden');
+        }
+
+        function selectNpc(npcId) {
+            gameState.selectedNpc = NPCS.find(n => n.id === npcId);
+            gameState.gameMode = 'pve';
+            startGame();
+        }
+
+        function startPvP() {
+            gameState.gameMode = 'pvp';
+            gameState.selectedNpc = null;
+            startGame();
+        }
+
+        function startGame() {
+            gameState.roles.attacker = Math.random() < 0.5 ? 'P1' : 'P2';
+            gameState.roles.defender = gameState.roles.attacker === 'P1' ? 'P2' : 'P1';
+            gameState.currentPicker = 'P1';
+            showScreen('pick-screen');
+            renderAgentGrid();
+            updatePickerUI();
+        }
+
+        // === NPC AI関数 ===
+        function npcPickDeck() {
+            const npc = gameState.selectedNpc;
+            if (!npc) return;
+            const selectedAgents = npc.deck.map(agentId => {
+                const agent = AGENTS.find(a => a.id === agentId);
+                return { ...agent, currentStats: { ...agent.baseStats }, killed: false };
+            });
+            gameState.decks.P2 = selectedAgents;
+        }
+
+        function npcBuyAbilities() {
+            const npc = gameState.selectedNpc;
+            if (!npc) return;
+
+            const buyer = 'P2';
+            const availableAbilities = [];
+
+            // 購入可能なアビリティを収集
+            gameState.decks[buyer].forEach(agent => {
+                agent.abilities.forEach(abilityId => {
+                    if (!gameState.matchPurchases[buyer].has(abilityId)) {
+                        const ability = ABILITIES[abilityId];
+                        if (gameState.credits[buyer] >= ability.cost) {
+                            availableAbilities.push({ agentId: agent.id, abilityId, ability });
+                        }
+                    }
+                });
+            });
+
+            // 優先度でソート
+            const prioritized = sortAbilitiesByPriority(availableAbilities, npc.buyPriority);
+
+            // 予算内で購入
+            for (const item of prioritized) {
+                if (gameState.credits[buyer] >= item.ability.cost) {
+                    if (!gameState.purchases[buyer][item.agentId]) {
+                        gameState.purchases[buyer][item.agentId] = [];
+                    }
+                    gameState.purchases[buyer][item.agentId].push(item.abilityId);
+                    gameState.credits[buyer] -= item.ability.cost;
+                    gameState.matchPurchases[buyer].add(item.abilityId);
+                }
+            }
+        }
+
+        function sortAbilitiesByPriority(abilities, priority) {
+            const isAttacker = gameState.roles.attacker === 'P2';
+
+            return abilities.sort((a, b) => {
+                const ea = a.ability.effect;
+                const eb = b.ability.effect;
+
+                let scoreA = 0, scoreB = 0;
+
+                switch (priority) {
+                    case 'random':
+                        return Math.random() - 0.5;
+                    case 'damage':
+                        scoreA = (ea.damage || 0);
+                        scoreB = (eb.damage || 0);
+                        break;
+                    case 'area':
+                        scoreA = (ea.area || 0);
+                        scoreB = (eb.area || 0);
+                        break;
+                    case 'entry':
+                        scoreA = (ea.entry || 0);
+                        scoreB = (eb.entry || 0);
+                        break;
+                    case 'retake':
+                        scoreA = (ea.retake || 0);
+                        scoreB = (eb.retake || 0);
+                        break;
+                    case 'debuff':
+                        scoreA = (ea.reduceEnemyDamage || 0) + (ea.reduceEnemyEntry || 0) + (ea.reduceEnemyRetake || 0);
+                        scoreB = (eb.reduceEnemyDamage || 0) + (eb.reduceEnemyEntry || 0) + (eb.reduceEnemyRetake || 0);
+                        break;
+                    case 'plant':
+                        if (isAttacker) {
+                            scoreA = (ea.entry || 0) * 2 + (ea.damage || 0);
+                            scoreB = (eb.entry || 0) * 2 + (eb.damage || 0);
+                        } else {
+                            scoreA = (ea.area || 0) * 2 + (ea.retake || 0);
+                            scoreB = (eb.area || 0) * 2 + (eb.retake || 0);
+                        }
+                        break;
+                    case 'survival':
+                        if (isAttacker) {
+                            scoreA = (ea.area || 0) * 2 + (ea.damage || 0);
+                            scoreB = (eb.area || 0) * 2 + (eb.damage || 0);
+                        } else {
+                            scoreA = (ea.retake || 0) * 2 + (ea.area || 0);
+                            scoreB = (eb.retake || 0) * 2 + (eb.area || 0);
+                        }
+                        break;
+                    case 'counter':
+                        scoreA = (ea.reduceEnemyDamage || 0) * 2 + (ea.reduceEnemyEntry || 0) + (ea.reduceEnemyRetake || 0) + (ea.damage || 0);
+                        scoreB = (eb.reduceEnemyDamage || 0) * 2 + (eb.reduceEnemyEntry || 0) + (eb.reduceEnemyRetake || 0) + (eb.damage || 0);
+                        break;
+                    default:
+                        return Math.random() - 0.5;
+                }
+                return scoreB - scoreA;
+            });
+        }
+
+        function npcSelectKillTargets(killCount) {
+            const npc = gameState.selectedNpc;
+            const player = 'P2';
+            const aliveAgents = gameState.decks[player].filter(a => !a.killed);
+
+            if (aliveAgents.length <= killCount) {
+                return aliveAgents.map(a => a.id);
+            }
+
+            let sorted;
+            switch (npc?.killPolicy) {
+                case 'random':
+                    sorted = aliveAgents.sort(() => Math.random() - 0.5);
+                    break;
+                case 'keepStrong':
+                case 'optimal':
+                    // 購入済みアビリティ数が多いエージェントを残す（少ないものをキル対象に）
+                    sorted = aliveAgents.sort((a, b) => {
+                        const aPurchases = (gameState.purchases[player][a.id] || []).length;
+                        const bPurchases = (gameState.purchases[player][b.id] || []).length;
+                        return aPurchases - bPurchases; // 購入少ない順
+                    });
+                    break;
+                default:
+                    sorted = aliveAgents;
+            }
+
+            return sorted.slice(0, killCount).map(a => a.id);
+        }
+
+        function renderAgentGrid() {
+            // VALORANT風：左にタイル一覧、右に詳細パネル
+            $('agent-list').innerHTML = AGENTS.map(agent => `
+                <div class="agent-tile" data-id="${agent.id}" onclick="showAgentDetail('${agent.id}')">
+                    <div class="tile-icon">${agent.icon}</div>
+                    <div class="tile-name">${agent.name}</div>
+                </div>
+            `).join('');
+            gameState.selectedAgentId = null;
+            updateAgentTileStates();
+        }
+
+        function showAgentDetail(agentId) {
+            const agent = AGENTS.find(a => a.id === agentId);
+            if (!agent) return;
+            gameState.selectedAgentId = agentId;
+
+            // タイルのactive状態を更新
+            document.querySelectorAll('.agent-tile').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.agent-tile[data-id="${agentId}"]`)?.classList.add('active');
+
+            // ミラーピック許可：同一プレイヤー内の重複のみ禁止（相手が選んでも選択可能）
+            const currentPlayer = gameState.currentPicker;
+            const isAlreadyPicked = gameState.tempSelection.includes(agentId) ||
+                gameState.decks[currentPlayer].some(a => a.id === agentId);
+
+            $('agent-detail').innerHTML = `
+                <div class="detail-header">
+                    <div class="detail-icon">${agent.icon}</div>
+                    <div class="detail-name">${agent.name}</div>
+                </div>
+                <div class="detail-abilities">
+                    <h4 style="margin-bottom:15px;color:var(--text-secondary);font-size:0.9rem;">アビリティ</h4>
+                    ${agent.abilities.map(abilityId => {
+                const ability = ABILITIES[abilityId];
+                return `
+                            <div class="detail-ability">
+                                <div class="detail-ability-name">${ability.name}</div>
+                                <div class="detail-ability-desc">効果: ${ability.desc}</div>
+                                <div class="detail-ability-cost">価格: ${ability.cost} クレジット</div>
+                            </div>
+                        `;
+            }).join('')}
+                </div>
+                ${!isAlreadyPicked && gameState.tempSelection.length < 5 ? `
+                    <button class="btn btn-primary detail-add-btn" onclick="addAgentToSelection('${agentId}')">選択に追加</button>
+                ` : isAlreadyPicked ? `
+                    <button class="btn btn-secondary detail-add-btn" onclick="removeAgentFromSelection('${agentId}')" ${gameState.tempSelection.includes(agentId) ? '' : 'disabled'}>選択から外す</button>
+                ` : `
+                    <p style="text-align:center;color:var(--text-secondary);margin-top:20px;">5体選択済み</p>
+                `}
+            `;
+        }
+
+        function addAgentToSelection(agentId) {
+            if (gameState.tempSelection.length >= 5) return;
+            if (!gameState.tempSelection.includes(agentId)) {
+                gameState.tempSelection.push(agentId);
+                updateDeckDisplay();
+                updateAgentTileStates();
+                showAgentDetail(agentId);
+            }
+        }
+
+        function removeAgentFromSelection(agentId) {
+            const idx = gameState.tempSelection.indexOf(agentId);
+            if (idx > -1) {
+                gameState.tempSelection.splice(idx, 1);
+                updateDeckDisplay();
+                updateAgentTileStates();
+                showAgentDetail(agentId);
+            }
+        }
+
+        function updateAgentTileStates() {
+            const currentPlayer = gameState.currentPicker;
+            const opponent = currentPlayer === 'P1' ? 'P2' : 'P1';
+
+            document.querySelectorAll('.agent-tile').forEach(tile => {
+                const id = tile.dataset.id;
+
+                // 自分が既に選択済み（同一プレイヤー内重複禁止）
+                const isPickedBySelf = gameState.tempSelection.includes(id) ||
+                    gameState.decks[currentPlayer].some(a => a.id === id);
+
+                // 相手が選択中（表示のみ、選択は可能）
+                const isPickedByOpponent = gameState.decks[opponent].some(a => a.id === id);
+
+                tile.classList.toggle('picked', isPickedBySelf);
+                tile.classList.toggle('opponent-picked', isPickedByOpponent && !isPickedBySelf);
+            });
+        }
+
+        function selectAgent(agentId) {
+            // 旧関数（互換性のため残す）
+            addAgentToSelection(agentId);
+        }
+
+        function updateDeckDisplay() {
+            const deckCards = $('deck-cards');
+            $('deck-count').textContent = gameState.tempSelection.length;
+            deckCards.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                const agentId = gameState.tempSelection[i];
+                if (agentId) {
+                    const agent = AGENTS.find(a => a.id === agentId);
+                    deckCards.innerHTML += `<div class="deck-slot filled"><div class="mini-name">${agent.icon}<br>${agent.name}</div></div>`;
+                } else {
+                    deckCards.innerHTML += `<div class="deck-slot">?</div>`;
+                }
+            }
+            $('confirm-pick-btn').disabled = gameState.tempSelection.length !== 5;
+        }
+
+        function clearSelection() {
+            gameState.tempSelection = [];
+            updateDeckDisplay();
+            updateAgentTileStates();
+            $('agent-detail').innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:50px;">エージェントを選択すると詳細が表示されます</p>';
+        }
+
+        function updatePickerUI() {
+            const indicator = $('current-picker');
+            indicator.textContent = `${gameState.currentPicker}のターン`;
+            indicator.className = 'player-indicator ' + (gameState.currentPicker === 'P1' ? 'p1' : 'p2');
+            updateAgentTileStates();
+            gameState.tempSelection = [];
+            updateDeckDisplay();
+            $('agent-detail').innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:50px;">エージェントを選択すると詳細が表示されます</p>';
+        }
+
+        function confirmPick() {
+            const selectedAgents = gameState.tempSelection.map(id => {
+                const agent = AGENTS.find(a => a.id === id);
+                return { ...agent, currentStats: { ...agent.baseStats }, killed: false };
+            });
+            gameState.decks[gameState.currentPicker] = selectedAgents;
+
+            if (gameState.currentPicker === 'P1') {
+                if (gameState.gameMode === 'pve') {
+                    // PvE: NPCが自動でデッキ選択
+                    npcPickDeck();
+                    startBuyPhase();
+                } else {
+                    // PvP: P2のターンへ
+                    gameState.currentPicker = 'P2';
+                    updatePickerUI();
+                }
+            } else {
+                startBuyPhase();
+            }
+        }
+
+        function startBuyPhase() {
+            // クレジット累積（リセットせず+1500加算）
+            gameState.credits.P1 += 1500;
+            gameState.credits.P2 += 1500;
+            // 現ラウンドの購入を初期化（アビリティ効果用）
+            gameState.purchases = { P1: {}, P2: {} };
+            gameState.currentBuyer = 'P1';
+            updateHeader();
+            showScreen('buy-screen');
+            renderBuyPhase();
+        }
+
+        function renderBuyPhase() {
+            const buyer = gameState.currentBuyer;
+            $('current-buyer').textContent = `${buyer}のターン`;
+            $('current-buyer').className = 'player-indicator ' + (buyer === 'P1' ? 'p1' : 'p2');
+            const deck = gameState.decks[buyer];
+            const purchases = gameState.purchases[buyer];
+
+            $('buy-cards-container').innerHTML = `
+            <div style="text-align:center;margin-bottom:20px;">
+                <span class="credits">💰 残りクレジット: ${gameState.credits[buyer]}</span>
+                <span style="margin-left:15px;color:var(--text-secondary);font-size:14px;">(今回支給: +1500)</span>
+            </div>
+            <div class="agent-grid">
+                ${deck.map(agent => {
+                const agentPurchases = purchases[agent.id] || [];
+                return `
+                        <div class="agent-card">
+                            <div class="card-portrait">${agent.icon}</div>
+                            <div class="card-name">${agent.name}</div>
+                            <div class="ability-list">
+                                ${agent.abilities.map(abilityId => {
+                    const ability = ABILITIES[abilityId];
+                    const purchasedThisRound = agentPurchases.includes(abilityId);
+                    const purchasedInMatch = gameState.matchPurchases[buyer].has(abilityId);
+                    const canAfford = gameState.credits[buyer] >= ability.cost;
+                    const isDisabled = purchasedInMatch && !purchasedThisRound; // 過去ラウンドで購入済み
+                    return `
+                                        <div class="ability-item ${purchasedThisRound ? 'purchased' : ''} ${isDisabled ? 'disabled-permanent' : ''}" 
+                                             onclick="${isDisabled ? '' : `toggleAbility('${agent.id}', '${abilityId}')`}"
+                                             style="${isDisabled ? 'opacity:0.5;cursor:not-allowed' : (!purchasedThisRound && !canAfford ? 'opacity:0.4' : 'cursor:pointer')}">
+                                            <div>
+                                                <div class="ability-name">
+                                                    ${ability.name}
+                                                    ${purchasedThisRound ? '<span class="ability-badge">購入済</span>' : ''}
+                                                    ${isDisabled ? '<span class="ability-badge" style="background:#666;">購入不可</span>' : ''}
+                                                </div>
+                                                <div class="ability-desc">${ability.desc}</div>
+                                            </div>
+                                            <div class="ability-cost">${ability.cost}</div>
+                                        </div>
+                                    `;
+                }).join('')}
+                            </div>
+                        </div>
+                    `;
+            }).join('')}
+            </div>
+        `;
+        }
+
+        function toggleAbility(agentId, abilityId) {
+            const buyer = gameState.currentBuyer;
+            const ability = ABILITIES[abilityId];
+
+            // 試合中に既に購入済みの場合は購入不可
+            if (gameState.matchPurchases[buyer].has(abilityId)) {
+                return; // 購入不可
+            }
+
+            if (!gameState.purchases[buyer][agentId]) gameState.purchases[buyer][agentId] = [];
+            const purchases = gameState.purchases[buyer][agentId];
+            const idx = purchases.indexOf(abilityId);
+            if (idx > -1) {
+                // 購入取り消し（現ラウンドのみ）
+                purchases.splice(idx, 1);
+                gameState.credits[buyer] += ability.cost;
+                gameState.matchPurchases[buyer].delete(abilityId);
+            }
+            else if (gameState.credits[buyer] >= ability.cost) {
+                // 新規購入
+                purchases.push(abilityId);
+                gameState.credits[buyer] -= ability.cost;
+                gameState.matchPurchases[buyer].add(abilityId);
+            }
+            renderBuyPhase();
+        }
+
+        function confirmBuy() {
+            if (gameState.currentBuyer === 'P1') {
+                if (gameState.gameMode === 'pve') {
+                    // PvE: NPCが自動購入してラウンド開始
+                    npcBuyAbilities();
+                    startRound();
+                } else {
+                    // PvP: P2のターンへ
+                    gameState.currentBuyer = 'P2';
+                    renderBuyPhase();
+                }
+            } else {
+                startRound();
+            }
+        }
+
+        function startRound() {
+            gameState.killed = { P1: [], P2: [] };
+            gameState.decks.P1.forEach(a => a.killed = false);
+            gameState.decks.P2.forEach(a => a.killed = false);
+            showScreen('round-screen');
+            showRoundReady();
+        }
+
+        function showRoundReady() {
+            $('phase-display').textContent = `⚔️ ラウンド ${gameState.roundIndex}`;
+            $('round-content').innerHTML = `
+            <div class="result-section fade-in">
+                <h3>ラウンド開始</h3>
+                <p style="margin:20px 0;">生存エージェントのステータスを集計します</p>
+                <div class="nav-buttons">
+                    <button class="btn btn-primary" onclick="stepCalculateStats()">集計する</button>
+                </div>
+            </div>
+        `;
+        }
+
+        function stepCalculateStats() {
+            $('phase-display').textContent = '📊 ステータス集計';
+            const computed = calculateStats();
+            gameState.computed = computed;
+            $('round-content').innerHTML = `
+            <div class="result-section fade-in">
+                <h3>ステータス集計結果</h3>
+                <div class="stats-comparison">
+                    <div class="stats-column">
+                        <h4>${gameState.roles.attacker} (攻撃)</h4>
+                        <div class="stat-row stat-dmg">💥 ダメージ: ${computed[gameState.roles.attacker].damage}</div>
+                        <div class="stat-row stat-entry">🚀 エントリー: ${computed[gameState.roles.attacker].entry}</div>
+                        <div class="stat-row stat-area">🎯 エリア: ${computed[gameState.roles.attacker].area}</div>
+                        <div class="stat-row stat-retake">🔄 リテイク: ${computed[gameState.roles.attacker].retake}</div>
+                    </div>
+                    <div class="vs-divider">VS</div>
+                    <div class="stats-column">
+                        <h4>${gameState.roles.defender} (防衛)</h4>
+                        <div class="stat-row stat-dmg">💥 ダメージ: ${computed[gameState.roles.defender].damage}</div>
+                        <div class="stat-row stat-entry">🚀 エントリー: ${computed[gameState.roles.defender].entry}</div>
+                        <div class="stat-row stat-area">🎯 エリア: ${computed[gameState.roles.defender].area}</div>
+                        <div class="stat-row stat-retake">🔄 リテイク: ${computed[gameState.roles.defender].retake}</div>
+                    </div>
+                </div>
+                <div class="nav-buttons" style="margin-top:30px;">
+                    <button class="btn btn-primary" onclick="stepPlantDetermination()">プラント判定へ</button>
+                </div>
+            </div>
+        `;
+        }
+
+        function stepPlantDetermination() {
+            $('phase-display').textContent = '💣 プラント判定';
+            const atk = gameState.roles.attacker, def = gameState.roles.defender;
+            const computed = gameState.computed;
+            let attackEntry = computed[atk].entry;
+            Object.values(gameState.purchases[atk]).flat().forEach(id => {
+                if (ABILITIES[id].effect.plantEntryBonus) attackEntry += ABILITIES[id].effect.plantEntryBonus;
+            });
+            const plantComplete = attackEntry > computed[def].area;
+            gameState.plantComplete = plantComplete;
+            $('round-content').innerHTML = `
+            <div class="result-section fade-in">
+                <h3>プラント判定</h3>
+                <p style="margin:15px 0;">攻撃エントリー(${attackEntry}) vs 防衛エリア(${computed[def].area})</p>
+                <div class="plant-badge ${plantComplete ? 'complete' : 'incomplete'}">
+                    ${plantComplete ? '💣 プラント完了!' : '🛡️ プラント阻止'}
+                </div>
+                <div class="nav-buttons" style="margin-top:30px;">
+                    <button class="btn btn-primary" onclick="stepKillCalculation()">キル数計算へ</button>
+                </div>
+            </div>
+        `;
+        }
+
+        function stepKillCalculation() {
+            $('phase-display').textContent = '⚔️ キル数計算';
+            const killCounts = calculateKills(gameState.computed);
+            gameState.killCounts = killCounts;
+            const atk = gameState.roles.attacker, def = gameState.roles.defender;
+            const hasKills = killCounts[atk] > 0 || killCounts[def] > 0;
+            $('round-content').innerHTML = `
+            <div class="result-section fade-in">
+                <h3>キル数計算結果</h3>
+                <p style="margin:10px 0;font-size:0.85rem;color:var(--text-secondary);">150ダメージ = 1キル</p>
+                <div class="stats-comparison">
+                    <div class="stats-column">
+                        <h4>${atk} (攻撃)</h4>
+                        <div class="kill-info">🗡️ ${killCounts[atk]} キル</div>
+                </div>
+                    <div class="vs-divider">⚔️</div>
+                    <div class="stats-column">
+                        <h4>${def} (防衛)</h4>
+                        <div class="kill-info">🗡️ ${killCounts[def]} キル</div>
+                    </div>
+                </div>
+                <div class="nav-buttons" style="margin-top:30px;">
+                    <button class="btn btn-primary" onclick="${hasKills ? 'stepKillSelection()' : 'stepWinnerDetermination()'}">
+                        ${hasKills ? 'キル選択へ' : '勝敗判定'}
+                    </button>
+                </div>
+            </div>
+        `;
+        }
+
+        async function stepKillSelection() {
+            for (const victim of ['P1', 'P2']) {
+                const killer = victim === 'P1' ? 'P2' : 'P1';
+                const killCount = gameState.killCounts[killer];
+                if (killCount > 0) {
+                    gameState.killSelecting = victim;
+                    gameState.tempKillSelection = [];
+
+                    // PvE時: P2（NPC）のキル選択は自動
+                    if (gameState.gameMode === 'pve' && victim === 'P2') {
+                        const npcSelections = npcSelectKillTargets(killCount);
+                        npcSelections.forEach(agentId => {
+                            gameState.tempKillSelection.push(agentId);
+                            const agent = gameState.decks.P2.find(a => a.id === agentId);
+                            if (agent) agent.killed = true;
+                        });
+                    } else {
+                        await showKillSelection(victim, killCount);
+                    }
+                }
+            }
+            showScreen('round-screen');
+            $('phase-display').textContent = '☠️ キル確定';
+            const atk = gameState.roles.attacker, def = gameState.roles.defender;
+            const atkAlive = gameState.decks[atk].filter(a => !a.killed).length;
+            const defAlive = gameState.decks[def].filter(a => !a.killed).length;
+            $('round-content').innerHTML = `
+                < div class="result-section fade-in" >
+                <h3>キル確定</h3>
+                <div class="stats-comparison">
+                    <div class="stats-column"><h4>${atk} (攻撃)</h4><div class="kill-info">生存: ${atkAlive}体</div></div>
+                    <div class="vs-divider">⚔️</div>
+                    <div class="stats-column"><h4>${def} (防衛)</h4><div class="kill-info">生存: ${defAlive}体</div></div>
+                </div>
+                <div class="nav-buttons" style="margin-top:30px;">
+                    <button class="btn btn-primary" onclick="stepWinnerDetermination()">勝敗判定</button>
+                </div>
+            </div >
+                `;
+        }
+
+        function calculateStats() {
+            const computed = { P1: { damage: 0, entry: 0, area: 0, retake: 0 }, P2: { damage: 0, entry: 0, area: 0, retake: 0 } };
+
+            // Step 1: 自分のステータス（基本値 + アビリティ効果）を集計
+            ['P1', 'P2'].forEach(player => {
+                gameState.decks[player].forEach(agent => {
+                    if (agent.killed) return;
+                    computed[player].damage += agent.baseStats.damage;
+                    computed[player].entry += agent.baseStats.entry;
+                    computed[player].area += agent.baseStats.area;
+                    computed[player].retake += agent.baseStats.retake;
+                    (gameState.purchases[player][agent.id] || []).forEach(abilityId => {
+                        const ability = ABILITIES[abilityId];
+                        // stat効果とmixed効果の自己バフ部分を適用
+                        if (ability.effect.damage) computed[player].damage += ability.effect.damage;
+                        if (ability.effect.entry) computed[player].entry += ability.effect.entry;
+                        if (ability.effect.area) computed[player].area += ability.effect.area;
+                        if (ability.effect.retake) computed[player].retake += ability.effect.retake;
+                    });
+                });
+            });
+
+            // Step 2: 相手への効果（ダメージ減少、エントリー減少、リテイク減少）を適用
+            ['P1', 'P2'].forEach(player => {
+                const opponent = player === 'P1' ? 'P2' : 'P1';
+                Object.values(gameState.purchases[player]).flat().forEach(abilityId => {
+                    const effect = ABILITIES[abilityId].effect;
+                    // 相手ダメージ減少
+                    if (effect.reduceEnemyDamage) {
+                        computed[opponent].damage = Math.max(0, computed[opponent].damage - effect.reduceEnemyDamage);
+                    }
+                    // 相手エントリー減少
+                    if (effect.reduceEnemyEntry) {
+                        computed[opponent].entry = Math.max(0, computed[opponent].entry - effect.reduceEnemyEntry);
+                    }
+                    // 相手リテイク減少
+                    if (effect.reduceEnemyRetake) {
+                        computed[opponent].retake = Math.max(0, computed[opponent].retake - effect.reduceEnemyRetake);
+                    }
+                });
+            });
+
+            return computed;
+        }
+
+        function calculateKills(computed) {
+            const killCounts = {};
+            ['P1', 'P2'].forEach(player => {
+                const opponent = player === 'P1' ? 'P2' : 'P1';
+                const opponentAlive = gameState.decks[opponent].filter(a => !a.killed).length;
+                let kills = Math.floor(computed[player].damage / 150);
+                kills = Math.min(kills, opponentAlive);
+                killCounts[player] = kills;
+            });
+            ['P1', 'P2'].forEach(player => {
+                Object.values(gameState.purchases[player]).flat().forEach(abilityId => {
+                    if (ABILITIES[abilityId].effect.extraKill) {
+                        const opponent = player === 'P1' ? 'P2' : 'P1';
+                        const opponentAlive = gameState.decks[opponent].filter(a => !a.killed).length;
+                        if (killCounts[player] < opponentAlive) {
+                            killCounts[player] = Math.min(killCounts[player] + ABILITIES[abilityId].effect.extraKill, opponentAlive);
+                        }
+                    }
+                });
+            });
+            return killCounts;
+        }
+
+        function showKillSelection(player, killCount) {
+            return new Promise(resolve => {
+                showScreen('kill-screen');
+                $('kill-instruction').textContent = `${player}: ${killCount}体を選択してキルされます`;
+                const deck = gameState.decks[player].filter(a => !a.killed);
+                const purchases = gameState.purchases[player];
+                $('kill-select-grid').innerHTML = deck.map(agent => {
+                    const agentPurchases = purchases[agent.id] || [];
+                    // 現在のステータスを計算
+                    const stats = { ...agent.baseStats };
+                    agentPurchases.forEach(abilityId => {
+                        const effect = ABILITIES[abilityId].effect;
+                        if (effect.damage) stats.damage += effect.damage;
+                        if (effect.entry) stats.entry += effect.entry;
+                        if (effect.area) stats.area += effect.area;
+                        if (effect.retake) stats.retake += effect.retake;
+                    });
+                    return `
+                    <div class="kill-select-card" data-id="${agent.id}" onclick="toggleKillSelect('${agent.id}')">
+                        <div class="card-portrait" style="height:50px;font-size:1.8rem;">${agent.icon}</div>
+                        <div class="card-name">${agent.name}</div>
+                        <div style="font-size:0.7rem;color:var(--text-secondary);margin:5px 0;">
+                            DMG:${stats.damage} / ENT:${stats.entry} / AREA:${stats.area} / RET:${stats.retake}
+                        </div>
+                        <div style="font-size:0.65rem;border-top:1px solid var(--border-color);padding-top:8px;margin-top:8px;text-align:left;">
+                            ${agent.abilities.map(abilityId => {
+                        const ability = ABILITIES[abilityId];
+                        const purchased = agentPurchases.includes(abilityId);
+                        return `<div style="margin:4px 0;${purchased ? 'color:var(--accent-defense);' : 'color:var(--text-secondary);'}">
+                                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                                        <span style="font-weight:600;">${ability.name} ($${ability.cost})</span>
+                                        ${purchased ? '<span class="ability-badge">ACTIVE</span>' : ''}
+                                    </div>
+                                    <div style="font-size:0.6rem;opacity:0.8;margin-top:2px;">— ${ability.desc}</div>
+                                </div>`;
+                    }).join('')}
+                        </div>
+                    </div>
+                `;
+                }).join('');
+                $('confirm-kill-btn').disabled = true;
+                window.currentKillResolve = resolve;
+                window.requiredKills = killCount;
+            });
+        }
+
+        function toggleKillSelect(agentId) {
+            const card = document.querySelector(`.kill-select-card[data-id="${agentId}"]`);
+            const idx = gameState.tempKillSelection.indexOf(agentId);
+            if (idx > -1) { gameState.tempKillSelection.splice(idx, 1); card.classList.remove('selected'); }
+            else if (gameState.tempKillSelection.length < window.requiredKills) { gameState.tempKillSelection.push(agentId); card.classList.add('selected'); }
+            $('confirm-kill-btn').disabled = gameState.tempKillSelection.length !== window.requiredKills;
+        }
+
+        function confirmKillSelection() {
+            const player = gameState.killSelecting;
+            gameState.tempKillSelection.forEach(agentId => {
+                const agent = gameState.decks[player].find(a => a.id === agentId);
+                if (agent) agent.killed = true;
+                gameState.killed[player].push(agentId);
+            });
+            gameState.tempKillSelection = [];
+            showScreen('round-screen');
+            if (window.currentKillResolve) window.currentKillResolve();
+        }
+
+        function stepWinnerDetermination() {
+            $('phase-display').textContent = '🏆 勝敗判定';
+            const atk = gameState.roles.attacker, def = gameState.roles.defender;
+            const atkAlive = gameState.decks[atk].filter(a => !a.killed).length;
+            const defAlive = gameState.decks[def].filter(a => !a.killed).length;
+            let winner = null, reason = '';
+            let forceAttackWin = false;
+            if (gameState.plantComplete) {
+                ['P1', 'P2'].forEach(p => {
+                    Object.values(gameState.purchases[p]).flat().forEach(id => {
+                        if (ABILITIES[id].effect.forceAttackWin) forceAttackWin = true;
+                    });
+                });
+            }
+            if (atkAlive === 0 && defAlive === 0) {
+                winner = (gameState.plantComplete || forceAttackWin) ? atk : def;
+                reason = (gameState.plantComplete || forceAttackWin) ? 'プラント完了により攻撃勝利' : 'プラント阻止により防衛勝利';
+            } else if (atkAlive === 0) { winner = def; reason = '攻撃側全滅！防衛勝利'; }
+            else if (defAlive === 0) { winner = atk; reason = '防衛側全滅！攻撃勝利'; }
+            else {
+                let atkArea = 0, defRetake = 0;
+                gameState.decks[atk].forEach(a => { if (!a.killed) atkArea += a.baseStats.area; });
+                gameState.decks[def].forEach(a => { if (!a.killed) defRetake += a.baseStats.retake; });
+                Object.values(gameState.purchases[atk]).flat().forEach(id => { if (ABILITIES[id].effect.areaBonus) atkArea += ABILITIES[id].effect.areaBonus; });
+                Object.values(gameState.purchases[def]).flat().forEach(id => { if (ABILITIES[id].effect.retakeBonus) defRetake += ABILITIES[id].effect.retakeBonus; });
+                if (atkArea > defRetake) { winner = atk; reason = `エリア(${atkArea}) > リテイク(${defRetake}) で攻撃勝利`; }
+                else if (defRetake > atkArea) { winner = def; reason = `リテイク(${defRetake}) > エリア(${atkArea}) で防衛勝利`; }
+                else { winner = gameState.plantComplete ? atk : def; reason = `同値！${gameState.plantComplete ? 'プラント完了で攻撃' : 'プラント阻止で防衛'}勝利`; }
+            }
+            gameState.scores[winner]++;
+            updateHeader();
+            const winnerRole = winner === atk ? 'attack' : 'defense';
+            $('round-content').innerHTML = `
+            <div class="result-section fade-in">
+                <h3>ラウンド結果</h3>
+                <p style="margin:15px 0;">攻撃生存: ${atkAlive}体 / 防衛生存: ${defAlive}体</p>
+                <div class="winner-display ${winnerRole}">${winner}の勝利！</div>
+                <p style="font-size:1rem;">${reason}</p>
+                <div class="nav-buttons" style="margin-top:30px;">
+                    <button class="btn btn-primary" onclick="nextRound()">次へ</button>
+                </div>
+            </div>
+        `;
+        }
+
+        function nextRound() {
+            if (gameState.scores.P1 >= 3 || gameState.scores.P2 >= 3) { endGame(); return; }
+            gameState.roundIndex++;
+            if (gameState.roundIndex > 4) { endGame(); return; }
+            if (gameState.roundIndex === 3) {
+                gameState.setIndex = 2;
+                const temp = gameState.roles.attacker;
+                gameState.roles.attacker = gameState.roles.defender;
+                gameState.roles.defender = temp;
+            }
+            gameState.decks.P1.forEach(a => a.killed = false);
+            gameState.decks.P2.forEach(a => a.killed = false);
+            startBuyPhase();
+        }
+
+        function endGame() {
+            showScreen('end-screen');
+            let result = '', resultClass = '';
+            if (gameState.scores.P1 > gameState.scores.P2) { result = '🏆 P1 の勝利！ 🏆'; resultClass = 'attack'; }
+            else if (gameState.scores.P2 > gameState.scores.P1) { result = '🏆 P2 の勝利！ 🏆'; resultClass = 'defense'; }
+            else { result = '🤝 引き分け 🤝'; resultClass = 'draw'; }
+            $('final-result').textContent = result;
+            $('final-result').className = 'final-result winner-display ' + resultClass;
+            $('final-scores').textContent = `P1: ${gameState.scores.P1} - P2: ${gameState.scores.P2}`;
+        }
+    </script>
+</body>
+
+</html>
